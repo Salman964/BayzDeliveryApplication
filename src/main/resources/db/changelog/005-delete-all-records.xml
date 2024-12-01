@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="005-delete-all-records" author="bayzdelivery">
+        <validCheckSum>9:9a721d5846210ab70ab0adbed996327e</validCheckSum>
+        <!-- <delete tableName="person" /> -->
+        <delete tableName="delivery" />
+    </changeSet>
+
+</databaseChangeLog>
