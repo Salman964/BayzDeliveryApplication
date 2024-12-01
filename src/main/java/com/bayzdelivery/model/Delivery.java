@@ -46,12 +46,12 @@ public class Delivery implements Serializable{
   @Column(name = "comission")
   BigDecimal comission;
 
-  @ManyToOne
-  @JoinColumn(name = "delivery_man_id", referencedColumnName = "id")
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "delivery_man_id", referencedColumnName = "id", nullable = false)
   Person deliveryMan;
 
-  @ManyToOne
-  @JoinColumn(name = "customer_id", referencedColumnName = "id")
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
   Person customer;
 
   public Long getId() {
