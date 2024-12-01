@@ -1,16 +1,14 @@
 package com.bayzdelivery.jobs;
 
 import com.bayzdelivery.model.Delivery;
-import com.bayzdelivery.service.DeliveryService;
+import com.bayzdelivery.repositories.DeliveryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-// Import other necessary classes
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -20,22 +18,29 @@ public class DelayedDeliveryNotifier {
     private static final Logger LOG = LoggerFactory.getLogger(DelayedDeliveryNotifier.class);
 
     @Autowired
-    private DeliveryService deliveryService;
+    private DeliveryRepository deliveryRepository;
 
-    @Scheduled(fixedDelay = 900000) // Runs every 15 minutes
+
+    @Scheduled(fixedDelay = 30000)
     public void checkDelayedDeliveries() {
-        List<Delivery> ongoingDeliveries = deliveryService.findOngoingDeliveries();
+        LOG.info("Checking for delayed deliveries...");
+        Instant cutoffTime = Instant.now().minusSeconds(45 * 60); // 45 minutes ago
+        List<Delivery> delayedDeliveries = deliveryRepository.findDelayedDeliveries(cutoffTime);
 
-        for (Delivery delivery : ongoingDeliveries) {
-            Duration duration = Duration.between(delivery.getStartTime(), Instant.now());
-            if (duration.toMinutes() > 45) {
+        if (!delayedDeliveries.isEmpty()) {
+            for (Delivery delivery : delayedDeliveries) {
+                LOG.warn("got delayed delivery: {}", delivery.getId());
                 notifyCustomerSupport(delivery);
             }
+        } else {
+            LOG.info("No delayed deliveries found.");
         }
     }
 
+
     @Async
     public void notifyCustomerSupport(Delivery delivery) {
-        LOG.info("Customer support team is notified! Delivery ID {} has exceeded 45 minutes.", delivery.getId());
+        System.out.println("Notifying customer support for delayed delivery ID: " + delivery.getId());
+        LOG.info("Customer support notified for delayed delivery ID: {}", delivery.getId());
     }
 }
