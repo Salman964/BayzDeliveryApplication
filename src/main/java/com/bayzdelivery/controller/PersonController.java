@@ -11,25 +11,12 @@ import java.util.List;
 @RequestMapping("/person")
 public class PersonController {
 
-    @Autowired
-    PersonService personService;
+  @Autowired
+  PersonService personService;
 
-    @PostMapping
-    public ResponseEntity<Person> register(@RequestBody Person p) {
-        return ResponseEntity.ok(personService.save(p));
-    }
+  @GetMapping
+  public ResponseEntity<List<Person>> getAllPersons() {
+      return ResponseEntity.ok(personService.getAll());
+  }
 
-    @GetMapping
-    public ResponseEntity<List<Person>> getAllPersons() {
-        return ResponseEntity.ok(personService.getAll());
-    }
-
-    @GetMapping("/{personId}")
-    public ResponseEntity<Person> getPersonById(@PathVariable Long personId) {
-        Person person = personService.findById(personId);
-        if (person != null) {
-            return ResponseEntity.ok(person);
-        }
-        return ResponseEntity.notFound().build();
-    }
 }
