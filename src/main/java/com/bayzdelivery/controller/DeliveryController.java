@@ -1,5 +1,6 @@
 package com.bayzdelivery.controller;
 
+import com.bayzdelivery.dto.TopDeliveryMenResponse;
 import com.bayzdelivery.model.Delivery;
 import com.bayzdelivery.service.DeliveryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 
 @RestController
 @RequestMapping("/delivery")
@@ -18,8 +20,17 @@ public class DeliveryController {
   DeliveryService deliveryService;
 
   @PostMapping
-  public ResponseEntity<Delivery> createNewDelivery(@RequestBody Delivery delivery) {
-    return ResponseEntity.ok(deliveryService.save(delivery));
+  public ResponseEntity<Object> createNewDelivery(@RequestBody Delivery delivery) {
+    System.out.println(delivery);
+
+    try {
+      Delivery savedDelivery = deliveryService.save(delivery);
+      return ResponseEntity.ok(savedDelivery);
+
+    } 
+    catch (IllegalArgumentException | IllegalStateException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
   }
 
   @GetMapping("/{deliveryId}")
@@ -30,17 +41,20 @@ public class DeliveryController {
     return ResponseEntity.notFound().build();
 	}
 
+  @GetMapping("/top-delivery-men")
+  public ResponseEntity<TopDeliveryMenResponse> getTopDeliveryMen(
+          @RequestParam("startTime") String startTimeStr,
+          @RequestParam("endTime") String endTimeStr) {
 
-	// @GetMapping("/top")
-	// public ResponseEntity<TopDeliveryMenResponse> getTopDeliveryMen(
-	// 				@RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startTime,
-	// 				@RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endTime) {
+      try {
+          Instant startTime = Instant.parse(startTimeStr);
+          Instant endTime = Instant.parse(endTimeStr);
 
-	// 		// Convert OffsetDateTime to Instant
-	// 		Instant startInstant = startTime.toInstant();
-	// 		Instant endInstant = endTime.toInstant();
+          TopDeliveryMenResponse response = deliveryService.getTopDeliveryMen(startTime, endTime);
+          return ResponseEntity.ok(response);
+      } catch (DateTimeParseException e) {
+          return ResponseEntity.badRequest().body(null);
+      }
+  }
 
-	// 		TopDeliveryMenResponse response = deliveryService.getTopDeliveryMen(startInstant, endInstant);
-	// 		return ResponseEntity.ok(response);
-	// }
 }

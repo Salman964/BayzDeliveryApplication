@@ -1,12 +1,18 @@
 package com.bayzdelivery.service;
 
 import com.bayzdelivery.dto.DeliveryManCommission;
+import com.bayzdelivery.dto.DeliveryManCommissionDTO;
 import com.bayzdelivery.dto.TopDeliveryMenResponse;
 import com.bayzdelivery.model.Delivery;
 import com.bayzdelivery.model.Role;
 import com.bayzdelivery.model.Person;
 import com.bayzdelivery.repositories.DeliveryRepository;
+import com.bayzdelivery.repositories.PersonRepository;
+import org.springframework.data.domain.Pageable;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,66 +24,75 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Autowired
     DeliveryRepository deliveryRepository;
+    
+
+    @Autowired
+    private PersonRepository personRepository;
+
+
+    @Override
+    public TopDeliveryMenResponse getTopDeliveryMen(Instant startTime, Instant endTime) {
+        Pageable topThree = PageRequest.of(0, 3);
+
+        List<DeliveryManCommissionDTO> topDeliveryMen = deliveryRepository.findTopDeliveryMenByCommission(
+                startTime, endTime, topThree);
+                
+                System.out.println(topDeliveryMen.get(0).getTotalCommission());
+                // System.out.println(topDeliveryMen.get(1).getTotalCommission());
+                // System.out.println(topDeliveryMen.get(2).getTotalCommission());
+                System.out.println("Salman   ------- Testing");
+
+
+        BigDecimal averageCommission = deliveryRepository.findAverageCommission(startTime, endTime);
+
+        TopDeliveryMenResponse response = new TopDeliveryMenResponse();
+        response.setTopDeliveryMen(topDeliveryMen);
+        response.setAverageCommission(averageCommission);
+
+        return response;
+    }
+
 
     @Override
     public Delivery save(Delivery delivery) {
-        if (delivery.getDeliveryMan() == null) {
-            throw new IllegalArgumentException("Delivery man must be assigned.");
-        }
 
-        if (!delivery.getDeliveryMan().getRole().equals(Role.DELIVERY_MAN)) {
-            throw new IllegalArgumentException("Assigned person is not a delivery man.");
-        }
+        // Fetch deliveryMan and customer and set them in delivery
+        Long deliveryManId = delivery.getDeliveryMan().getId();
+        Person deliveryMan = personRepository.findById(deliveryManId)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid deliveryMan ID"));
+        delivery.setDeliveryMan(deliveryMan);
 
-        boolean hasOngoingDelivery = deliveryRepository.existsByDeliveryManIdAndEndTimeIsNull(delivery.getDeliveryMan().getId());
+        Person customer = personRepository.findById(delivery.getCustomer().getId())
+            .orElseThrow(() -> new IllegalArgumentException("Invalid customer ID"));
+        delivery.setCustomer(customer);
+
+        BigDecimal commission = calculateCommission(delivery);
+        System.out.println(commission);
+        delivery.setComission(commission);
+
+        boolean hasOngoingDelivery = deliveryRepository.existsByDeliveryMan_IdAndEndTimeIsNull(deliveryManId);
         if (hasOngoingDelivery) {
             throw new IllegalStateException("Delivery man is already assigned to an ongoing delivery.");
         }
 
-        // Calculate and set commission
-        BigDecimal commission = calculateCommission(delivery);
-        delivery.setComission(commission);
+        // Save the delivery
+        Delivery savedDelivery = deliveryRepository.save(delivery);
+        
 
-        return deliveryRepository.save(delivery);
+
+        // Initialize deliveryMan and customer to ensure they are loaded
+        savedDelivery.getDeliveryMan().getName(); // Access a property to initialize
+        savedDelivery.getCustomer().getName(); // Access a property to initialize
+
+
+        return savedDelivery;
     }
+
 
     @Override
     public Delivery findById(Long deliveryId) {
         Optional<Delivery> optionalDelivery = deliveryRepository.findById(deliveryId);
         return optionalDelivery.orElse(null);
-    }
-
-    @Override
-    public TopDeliveryMenResponse getTopDeliveryMen(Instant startTime, Instant endTime) {
-        List<Delivery> deliveries = deliveryRepository.findByStartTimeBetween(startTime, endTime);
-
-        Map<Person, BigDecimal> commissionMap = new HashMap<>();
-
-        for (Delivery delivery : deliveries) {
-            if (delivery.getDeliveryMan() != null) {
-                BigDecimal commission = calculateCommission(delivery);
-                commissionMap.merge(delivery.getDeliveryMan(), commission, BigDecimal::add);
-            }
-        }
-
-        List<DeliveryManCommission> deliveryManCommissions = new ArrayList<>();
-        for (Map.Entry<Person, BigDecimal> entry : commissionMap.entrySet()) {
-            deliveryManCommissions.add(new DeliveryManCommission(entry.getKey(), entry.getValue()));
-        }
-
-        deliveryManCommissions.sort((a, b) -> b.getTotalCommission().compareTo(a.getTotalCommission()));
-
-        List<DeliveryManCommission> topDeliveryMen = deliveryManCommissions.stream().limit(3).toList();
-
-        BigDecimal averageCommission = BigDecimal.ZERO;
-        if (!topDeliveryMen.isEmpty()) {
-            BigDecimal totalCommission = topDeliveryMen.stream()
-                    .map(DeliveryManCommission::getTotalCommission)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            averageCommission = totalCommission.divide(BigDecimal.valueOf(topDeliveryMen.size()), BigDecimal.ROUND_HALF_UP);
-        }
-
-        return new TopDeliveryMenResponse(topDeliveryMen, averageCommission);
     }
 
     @Override
