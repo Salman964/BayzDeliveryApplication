@@ -3,7 +3,9 @@ package com.bayzdelivery.controller;
 import com.bayzdelivery.repositories.PersonRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+// import org.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -14,16 +16,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class PersonControllerTest {
 
-  MockMvc mockMvc;
+  private MockMvc mockMvc;
 
-  @Mock
+  @MockBean
   private PersonController personController;
 
   @Autowired
   private TestRestTemplate template;
 
   @Autowired
-  PersonRepository personRepository;
+  private PersonRepository personRepository;
 
   @BeforeEach
   public void setup() throws Exception {
@@ -31,6 +33,8 @@ public class PersonControllerTest {
   }
 
   @Test
-  public void testUserShouldBeRegistered() { }
-
+  public void testUserShouldBeRegistered() {
+    // Add assertions or API call tests
+    // System.out.println("Test executed successfully!");
+  }
 }

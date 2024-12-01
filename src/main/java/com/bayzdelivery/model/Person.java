@@ -1,20 +1,9 @@
 package com.bayzdelivery.model;
 
-//import java.io.Serializable;
-//import jakarta.persistence.Column;
-//import jakarta.persistence.Entity;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
-//import jakarta.persistence.Id;
-//import jakarta.persistence.Table;
-//import jakarta.validation.constraints.Email;
-//import jakarta.validation.constraints.NotNull;
-
-
- import jakarta.persistence.*;
- import jakarta.validation.constraints.Email;
- import jakarta.validation.constraints.NotNull;
- import java.io.Serializable;
+import java.io.Serializable;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "person")
@@ -48,7 +37,9 @@ public class Person implements Serializable{
     return role;
   }
 
-
+  public void setRole(Role role) {
+    this.role = role;
+  }
 
   public Long getId() {
     return id;
@@ -129,8 +120,4 @@ public class Person implements Serializable{
   public String toString() {
     return "Person [id=" + id + ", name=" + name + ", email=" + email + ", registrationNumber=" + registrationNumber + "]";
   }
-
-
-
-
 }

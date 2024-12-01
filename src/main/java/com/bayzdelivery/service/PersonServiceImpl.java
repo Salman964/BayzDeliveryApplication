@@ -23,18 +23,18 @@ public class PersonServiceImpl implements PersonService {
         return personList;
     }
 
-    // @Override
-    // public Person save(Person p) {
-    //     if (p.getRole() == null) {
-    //         throw new IllegalArgumentException("Role must be specified.");
-    //     }
+    @Override
+    public Person save(Person p) {
+        if (p.getRole() == null) {
+            throw new IllegalArgumentException("Role must be specified.");
+        }
 
-    //     if (p.getRole() != Role.CUSTOMER && p.getRole() != Role.DELIVERY_MAN) {
-    //         throw new IllegalArgumentException("Invalid role.");
-    //     }
+        if (p.getRole() != Role.CUSTOMER && p.getRole() != Role.DELIVERY_MAN) {
+            throw new IllegalArgumentException("Invalid role.");
+        }
 
-    //     return personRepository.save(p);
-    // }
+        return personRepository.save(p);
+    }
 
     @Override
     public Person findById(Long personId) {

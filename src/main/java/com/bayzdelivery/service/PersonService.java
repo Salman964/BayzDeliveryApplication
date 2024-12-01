@@ -7,7 +7,7 @@ public interface PersonService {
 
   List<Person> getAll();
 
-  // Person save(Person p);
+  Person save(Person p);
 
   Person findById(Long personId);
 }
