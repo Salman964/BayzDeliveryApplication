@@ -1,16 +1,22 @@
 package com.bayzdelivery.model;
 
-import java.io.Serializable;
-import java.time.Instant;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+// import java.io.Serializable;
+// import java.time.Instant;
+// import jakarta.persistence.Column;
+// import jakarta.persistence.Entity;
+// import jakarta.persistence.GeneratedValue;
+// import jakarta.persistence.GenerationType;
+// import jakarta.persistence.Id;
+// import jakarta.persistence.JoinColumn;
+// import jakarta.persistence.ManyToOne;
+// import jakarta.persistence.Table;
+// import jakarta.validation.constraints.NotNull;
+
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.Instant;
 
 @Entity
 @Table(name = "delivery")
@@ -26,18 +32,19 @@ public class Delivery implements Serializable{
   @Column(name = "start_time")
   Instant startTime;
 
-  @NotNull
   @Column(name = "end_time")
   Instant endTime;
 
+  @NotNull
   @Column(name = "distance")
-  Long distance;
+  Double distance;
 
+  @NotNull
   @Column(name = "price")
-  Long price;
+  BigDecimal price;
 
   @Column(name = "comission")
-  Long comission;
+  BigDecimal comission;
 
   @ManyToOne
   @JoinColumn(name = "delivery_man_id", referencedColumnName = "id")
@@ -71,27 +78,27 @@ public class Delivery implements Serializable{
     this.endTime = endTime;
   }
 
-  public Long getDistance() {
+  public Double getDistance() {
     return distance;
   }
 
-  public void setDistance(Long distance) {
+  public void setDistance(Double distance) {
     this.distance = distance;
   }
 
-  public Long getPrice() {
+  public BigDecimal getPrice() {
     return price;
   }
 
-  public void setPrice(Long price) {
+  public void setPrice(BigDecimal price) {
     this.price = price;
   }
 
-  public Long getComission() {
+  public BigDecimal getComission() {
     return comission;
   }
 
-  public void setComission(Long comission) {
+  public void setComission(BigDecimal comission) {
     this.comission = comission;
   }
 

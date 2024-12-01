@@ -1,14 +1,20 @@
 package com.bayzdelivery.model;
 
-import java.io.Serializable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+//import java.io.Serializable;
+//import jakarta.persistence.Column;
+//import jakarta.persistence.Entity;
+//import jakarta.persistence.GeneratedValue;
+//import jakarta.persistence.GenerationType;
+//import jakarta.persistence.Id;
+//import jakarta.persistence.Table;
+//import jakarta.validation.constraints.Email;
+//import jakarta.validation.constraints.NotNull;
+
+
+ import jakarta.persistence.*;
+ import jakarta.validation.constraints.Email;
+ import jakarta.validation.constraints.NotNull;
+ import java.io.Serializable;
 
 @Entity
 @Table(name = "person")
@@ -27,11 +33,22 @@ public class Person implements Serializable{
 
   @NotNull
   @Email
-  @Column(name = "email")
+  @Column(name = "email", unique = true)
   String email;
 
   @Column(name = "registration_number")
   String registrationNumber;
+
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role")
+  Role role;
+
+  public Role getRole() {
+    return role;
+  }
+
+
 
   public Long getId() {
     return id;

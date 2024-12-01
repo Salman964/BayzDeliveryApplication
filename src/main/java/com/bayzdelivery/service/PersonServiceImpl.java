@@ -1,13 +1,14 @@
 package com.bayzdelivery.service;
 
+import com.bayzdelivery.model.Person;
+import com.bayzdelivery.model.Role;
+import com.bayzdelivery.repositories.PersonRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.bayzdelivery.repositories.PersonRepository;
-import com.bayzdelivery.model.Person;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PersonServiceImpl implements PersonService {
@@ -22,7 +23,16 @@ public class PersonServiceImpl implements PersonService {
         return personList;
     }
 
+    @Override
     public Person save(Person p) {
+        if (p.getRole() == null) {
+            throw new IllegalArgumentException("Role must be specified.");
+        }
+
+        if (p.getRole() != Role.CUSTOMER && p.getRole() != Role.DELIVERY_MAN) {
+            throw new IllegalArgumentException("Invalid role.");
+        }
+
         return personRepository.save(p);
     }
 

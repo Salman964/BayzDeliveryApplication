@@ -1,13 +1,13 @@
 package com.bayzdelivery.service;
 
-import java.util.List;
 import com.bayzdelivery.model.Person;
+import java.util.List;
 
 public interface PersonService {
-  public List<Person> getAll();
 
-  public Person save(Person p);
+  List<Person> getAll();
 
-  public Person findById(Long personId);
+  Person save(Person p);
 
+  Person findById(Long personId);
 }
